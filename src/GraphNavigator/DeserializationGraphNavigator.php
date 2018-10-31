@@ -123,7 +123,7 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
         // Sometimes data can convey null but is not of a null type.
         // Visitors can have the power to add this custom null evaluation
         // If null is explicitly allowed we should skip this
-        if (!$this->shouldDeserializeNull
+        if (false === $this->shouldDeserializeNull
             && $this->visitor instanceof NullAwareVisitorInterface
             && true === $this->visitor->isNull($data)
         ) {
@@ -215,7 +215,7 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
                     try {
                         $v = $this->visitor->visitProperty($propertyMetadata, $data);
 
-                        if ($v !== null || $this->shouldDeserializeNull === true) {
+                        if (null !== $v || true === $this->shouldDeserializeNull) {
                             $this->accessor->setValue($object, $v, $propertyMetadata, $this->context);
                         }
                     } catch (NotAcceptableException $e) {
