@@ -197,12 +197,15 @@ abstract class BaseSerializationTest extends TestCase
         if (!$this->hasDeserializer()) {
             $this->markTestSkipped(sprintf('No deserializer available for format `%s`', $this->getFormat()));
         }
+        $ctx = DeserializationContext::create()
+            ->setDeserializeNull(true);
 
         /** @var ObjectWithNullObject $dObj */
         $dObj = $this->serializer->deserialize(
             $this->getContent('simple_object_nullable'),
             ObjectWithNullObject::class,
-            $this->getFormat()
+            $this->getFormat(),
+            $ctx
         );
 
         self::assertSame('nullObject', $dObj->getNullProperty());
@@ -743,14 +746,15 @@ abstract class BaseSerializationTest extends TestCase
         self::assertEquals($this->getContent('blog_post_unauthored'), $this->serialize($post, SerializationContext::create()->setSerializeNull(true)));
 
         if ($this->hasDeserializer()) {
-            $deserialized = $this->deserialize($this->getContent('blog_post_unauthored'), get_class($post), DeserializationContext::create());
+            $ctx =  DeserializationContext::create()
+            $deserialized = $this->deserialize($this->getContent('blog_post_unauthored'), get_class($post), $ctx);
 
             self::assertEquals('2011-07-30T00:00:00+00:00', $this->getField($deserialized, 'createdAt')->format(\DateTime::ATOM));
             self::assertAttributeEquals('This is a nice title.', 'title', $deserialized);
             self::assertAttributeSame(false, 'published', $deserialized);
             self::assertAttributeSame(false, 'reviewed', $deserialized);
             self::assertAttributeEquals(new ArrayCollection(), 'comments', $deserialized);
-            self::assertEquals(null, $this->getField($deserialized, 'author'));
+            self::assertEquals($author, $this->getField($deserialized, 'author'));
         }
     }
 

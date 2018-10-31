@@ -6,6 +6,7 @@ namespace JMS\Serializer\GraphNavigator;
 
 use JMS\Serializer\Accessor\AccessorStrategyInterface;
 use JMS\Serializer\Construction\ObjectConstructorInterface;
+use JMS\Serializer\Context;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
 use JMS\Serializer\EventDispatcher\EventDispatcherInterface;
@@ -21,9 +22,9 @@ use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\Metadata\ClassMetadata;
-use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\NullAwareVisitorInterface;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
+use JMS\Serializer\VisitorInterface;
 use Metadata\MetadataFactoryInterface;
 
 /**
@@ -75,6 +76,11 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
      */
     private $accessor;
 
+    /**
+     * @var bool
+     */
+    private $shouldDeserializeNull;
+
     public function __construct(
         MetadataFactoryInterface $metadataFactory,
         HandlerRegistryInterface $handlerRegistry,
@@ -93,6 +99,12 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
         }
     }
 
+    public function initialize(VisitorInterface $visitor, Context $context): void
+    {
+        parent::initialize($visitor, $context);
+        $this->shouldDeserializeNull = $context->shouldDeserializeNull();
+    }
+
     /**
      * Called for each node of the graph that is being traversed.
      *
@@ -109,22 +121,12 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
             throw new RuntimeException('The type must be given for all properties when deserializing.');
         }
 
-        $shouldDeserializeNull = false;
-        $metadataStack = $this->context->getMetadataStack();
-
-        if (!$metadataStack->isEmpty()) {
-            $currentPropertyMetadata = $metadataStack->top();
-            if ($currentPropertyMetadata instanceof PropertyMetadata) {
-                $shouldDeserializeNull = $currentPropertyMetadata->deserializeNull;
-            }
-        }
-
         // Sometimes data can convey null but is not of a null type.
         // Visitors can have the power to add this custom null evaluation
         // If null is explicitly allowed we should skip this
-        if ($this->visitor instanceof NullAwareVisitorInterface
+        if (!$this->shouldDeserializeNull
+            && $this->visitor instanceof NullAwareVisitorInterface
             && true === $this->visitor->isNull($data)
-            && !$shouldDeserializeNull
         ) {
             $type = ['name' => 'NULL', 'params' => []];
         }
@@ -213,7 +215,10 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
                     $this->context->pushPropertyMetadata($propertyMetadata);
                     try {
                         $v = $this->visitor->visitProperty($propertyMetadata, $data);
-                        $this->accessor->setValue($object, $v, $propertyMetadata, $this->context);
+
+                        if ($v !== null || $this->shouldDeserializeNull === true) {
+                            $this->accessor->setValue($object, $v, $propertyMetadata, $this->context);
+                        }
                     } catch (NotAcceptableException $e) {
                     }
                     $this->context->popPropertyMetadata();
@@ -221,6 +226,7 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
 
                 $rs = $this->visitor->endVisitingObject($metadata, $data, $type);
                 $this->afterVisitingObject($metadata, $rs, $type);
+
 
                 return $rs;
         }
