@@ -177,10 +177,6 @@ class XmlDriver extends AbstractFileDriver
                         $pMetadata->excludeIf = (string) $excludeIf;
                     }
 
-                    if (null !== $deserializeNull = $pElem->attributes()->{'deserialize-null'}) {
-                        $pMetadata->deserializeNull = 'true' === strtolower((string) $deserializeNull);
-                    }
-
                     if (null !== $skip = $pElem->attributes()->{'skip-when-empty'}) {
                         $pMetadata->skipWhenEmpty = 'true' === strtolower((string) $skip);
                     }

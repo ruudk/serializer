@@ -1,5 +1,0 @@
-JMS\Serializer\Tests\Fixtures\ObjectWithNullObject:
-    properties:
-        nullProperty:
-            type: NullObject
-            deserialize_null: true

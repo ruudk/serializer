@@ -120,7 +120,6 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
         if (null === $type) {
             throw new RuntimeException('The type must be given for all properties when deserializing.');
         }
-
         // Sometimes data can convey null but is not of a null type.
         // Visitors can have the power to add this custom null evaluation
         // If null is explicitly allowed we should skip this
@@ -226,7 +225,6 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
 
                 $rs = $this->visitor->endVisitingObject($metadata, $data, $type);
                 $this->afterVisitingObject($metadata, $rs, $type);
-
 
                 return $rs;
         }

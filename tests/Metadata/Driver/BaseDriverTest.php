@@ -137,15 +137,6 @@ abstract class BaseDriverTest extends TestCase
         self::assertEquals($p, $m->propertyMetadata['virtualValue']);
     }
 
-    public function testNullObject()
-    {
-        $m = $this->getDriver()->loadMetadataForClass(new \ReflectionClass('JMS\Serializer\Tests\Fixtures\ObjectWithNullObject'));
-
-        self::assertArrayHasKey('nullProperty', $m->propertyMetadata);
-
-        self::assertTrue($m->propertyMetadata['nullProperty']->deserializeNull);
-    }
-
     public function testFirstClassListCollection()
     {
         $m = $this->getDriver()->loadMetadataForClass(new \ReflectionClass(FirstClassListCollection::class));

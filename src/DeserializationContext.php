@@ -39,7 +39,7 @@ class DeserializationContext extends Context
     }
 
     /**
-     * Set if NULLs should be serialized (TRUE) ot not (FALSE)
+     * Set if NULLs should be deserialized (TRUE) ot not (FALSE)
      */
     public function setDeserializeNull(bool $bool): self
     {
@@ -49,8 +49,8 @@ class DeserializationContext extends Context
     }
 
     /**
-     * Returns TRUE when NULLs should be serialized
-     * Returns FALSE when NULLs should not be serialized
+     * Returns TRUE when NULLs should be deserialized
+     * Returns FALSE when NULLs should not be deserialized
      */
     public function shouldDeserializeNull(): bool
     {

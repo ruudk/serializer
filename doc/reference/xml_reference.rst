@@ -19,7 +19,6 @@ XML Reference
                       expose="true"
                       exclude-if="expr"
                       expose-if="expr"
-                      deserialize-null="false"
                       skip-when-empty="false"
                       type="string"
                       serialized-name="foo"

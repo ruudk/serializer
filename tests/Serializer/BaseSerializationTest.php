@@ -173,7 +173,7 @@ abstract class BaseSerializationTest extends TestCase
         );
     }
 
-    public function testDeserializeNullProperty()
+    public function testDeserializeNullObject()
     {
         if (!$this->hasDeserializer()) {
             $this->markTestSkipped(sprintf('No deserializer available for format `%s`', $this->getFormat()));
@@ -192,7 +192,7 @@ abstract class BaseSerializationTest extends TestCase
         self::assertNull($dObj->getNullProperty());
     }
 
-    public function testDeserializeNullObject()
+    public function testDeserializeNullObjectWithHandler()
     {
         if (!$this->hasDeserializer()) {
             $this->markTestSkipped(sprintf('No deserializer available for format `%s`', $this->getFormat()));
