@@ -746,8 +746,7 @@ abstract class BaseSerializationTest extends TestCase
         self::assertEquals($this->getContent('blog_post_unauthored'), $this->serialize($post, SerializationContext::create()->setSerializeNull(true)));
 
         if ($this->hasDeserializer()) {
-            $ctx =  DeserializationContext::create()
-            $deserialized = $this->deserialize($this->getContent('blog_post_unauthored'), get_class($post), $ctx);
+            $deserialized = $this->deserialize($this->getContent('blog_post_unauthored'), get_class($post));
 
             self::assertEquals('2011-07-30T00:00:00+00:00', $this->getField($deserialized, 'createdAt')->format(\DateTime::ATOM));
             self::assertAttributeEquals('This is a nice title.', 'title', $deserialized);
@@ -755,6 +754,37 @@ abstract class BaseSerializationTest extends TestCase
             self::assertAttributeSame(false, 'reviewed', $deserialized);
             self::assertAttributeEquals(new ArrayCollection(), 'comments', $deserialized);
             self::assertEquals($author, $this->getField($deserialized, 'author'));
+        }
+    }
+
+    public function testDeserializingNullAllowed()
+    {
+        $objectConstructor = new InitializedBlogPostConstructor();
+
+        $builder = SerializerBuilder::create();
+        $builder->setObjectConstructor($objectConstructor);
+        $this->serializer = $builder->build();
+
+        $post = new BlogPost('This is a nice title.', $author = new Author('Foo Bar'), new \DateTime('2011-07-30 00:00', new \DateTimeZone('UTC')), new Publisher('Bar Foo'));
+
+        $this->setField($post, 'author', null);
+        $this->setField($post, 'publisher', null);
+
+        $ctx = SerializationContext::create()->setSerializeNull(true);
+        self::assertEquals($this->getContent('blog_post_unauthored'), $this->serialize($post, $ctx));
+
+        if ($this->hasDeserializer()) {
+            $ctx =  DeserializationContext::create();
+            $ctx->setDeserializeNull(true);
+
+            $deserialized = $this->deserialize($this->getContent('blog_post_unauthored'), get_class($post), $ctx);
+
+            self::assertEquals('2011-07-30T00:00:00+00:00', $this->getField($deserialized, 'createdAt')->format(\DateTime::ATOM));
+            self::assertAttributeEquals('This is a nice title.', 'title', $deserialized);
+            self::assertAttributeSame(false, 'published', $deserialized);
+            self::assertAttributeSame(false, 'reviewed', $deserialized);
+            self::assertAttributeEquals(new ArrayCollection(), 'comments', $deserialized);
+            self::assertEquals(null, $this->getField($deserialized, 'author'));
         }
     }
 

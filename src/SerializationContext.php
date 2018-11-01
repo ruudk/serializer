@@ -153,23 +153,4 @@ class SerializationContext extends Context
             ? $this->initialType
             : $this->hasAttribute('initial_type') ? $this->getAttribute('initial_type') : null;
     }
-
-    /**
-     * Set if NULLs should be serialized (TRUE) ot not (FALSE)
-     */
-    public function setSerializeNull(bool $bool): self
-    {
-        $this->serializeNull = $bool;
-
-        return $this;
-    }
-
-    /**
-     * Returns TRUE when NULLs should be serialized
-     * Returns FALSE when NULLs should not be serialized
-     */
-    public function shouldSerializeNull(): bool
-    {
-        return $this->serializeNull;
-    }
 }
