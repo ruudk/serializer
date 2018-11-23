@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Tests\Metadata\Driver;
 
+use JMS\Serializer\Expression\ExpressionEvaluator;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
@@ -22,6 +23,8 @@ use JMS\Serializer\Tests\Fixtures\ObjectWithVirtualPropertiesAndExcludeAll;
 use JMS\Serializer\Tests\Fixtures\ParentSkipWithEmptyChild;
 use Metadata\Driver\DriverInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 abstract class BaseDriverTest extends TestCase
 {
@@ -583,4 +586,16 @@ abstract class BaseDriverTest extends TestCase
      * @return DriverInterface
      */
     abstract protected function getDriver();
+
+    protected function getExpressionEvaluator()
+    {
+        $language = new ExpressionLanguage();
+
+        $language->addFunction(new ExpressionFunction('show_data', static function () {
+            return 'true';
+        }, static function () {
+            return true;
+        }));
+        return new ExpressionEvaluator($language);
+    }
 }

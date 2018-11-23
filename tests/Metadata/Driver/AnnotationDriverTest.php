@@ -12,6 +12,6 @@ class AnnotationDriverTest extends BaseDriverTest
 {
     protected function getDriver()
     {
-        return new AnnotationDriver(new AnnotationReader(), new IdenticalPropertyNamingStrategy());
+        return new AnnotationDriver(new AnnotationReader(), new IdenticalPropertyNamingStrategy(), null, $this->getExpressionEvaluator());
     }
 }
