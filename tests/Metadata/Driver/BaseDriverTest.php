@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Tests\Metadata\Driver;
 
+use JMS\Serializer\Exception\InvalidMetadataException;
 use JMS\Serializer\Expression\ExpressionEvaluator;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
@@ -18,6 +19,7 @@ use JMS\Serializer\Tests\Fixtures\Discriminator\ObjectWithXmlNamespaceDiscrimina
 use JMS\Serializer\Tests\Fixtures\FirstClassListCollection;
 use JMS\Serializer\Tests\Fixtures\FirstClassMapCollection;
 use JMS\Serializer\Tests\Fixtures\ObjectWithExpressionVirtualPropertiesAndExcludeAll;
+use JMS\Serializer\Tests\Fixtures\ObjectWithInvalidExpression;
 use JMS\Serializer\Tests\Fixtures\ObjectWithVirtualPropertiesAndDuplicatePropName;
 use JMS\Serializer\Tests\Fixtures\ObjectWithVirtualPropertiesAndExcludeAll;
 use JMS\Serializer\Tests\Fixtures\ParentSkipWithEmptyChild;
@@ -160,6 +162,14 @@ abstract class BaseDriverTest extends TestCase
 
         self::assertArrayHasKey('array', $m->propertyMetadata);
         self::assertTrue($m->propertyMetadata['array']->xmlKeyValuePairs);
+    }
+
+    public function testInvalidExpression()
+    {
+        $this->expectException(InvalidMetadataException::class);
+
+        $a = new ObjectWithInvalidExpression();
+        $this->getDriver()->loadMetadataForClass(new \ReflectionClass($a));
     }
 
     public function testExpressionVirtualPropertyWithExcludeAll()
