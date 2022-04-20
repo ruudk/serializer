@@ -53,7 +53,7 @@ final class Lexer extends AbstractLexer implements ParserInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return int|string|null
      */
     protected function getType(&$value)
     {
